@@ -1,62 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MisteTube - Pro Edition</title>
     <style>
-        /* БАЗОВІ СТИЛІ ТА НЕОНОВЕ ЛОГО */
         body { background: #000; color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; }
         .header { position: sticky; top: 0; background: rgba(15, 15, 15, 0.9); padding: 10px 15px; z-index: 1000; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid red; backdrop-filter: blur(10px); }
-        
-        .logo { font-size: 22px; font-weight: bold; text-decoration: none; color: red; letter-spacing: 1px; 
-            animation: neon 1.5s ease-in-out infinite alternate; }
+        .logo { font-size: 22px; font-weight: bold; text-decoration: none; color: red; letter-spacing: 1px; animation: neon 1.5s ease-in-out infinite alternate; }
         .logo span { color: white; }
         @keyframes neon { from { text-shadow: 0 0 5px red; } to { text-shadow: 0 0 20px red, 0 0 30px #ff0000; } }
-
-        .menu-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: white; transition: 0.3s; }
+        .menu-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: white; }
         .search-box { flex-grow: 1; display: flex; max-width: 450px; margin: 0 auto; }
         input { background: #181818; border: 1px solid #333; color: white; padding: 10px 20px; border-radius: 20px; width: 100%; outline: none; transition: 0.3s; }
         input:focus { border-color: red; box-shadow: 0 0 15px rgba(255,0,0,0.3); }
-
-        /* SIDEBAR ТА OVERLAY (ЗАКРИТТЯ МЕНЮ) */
-        .sidebar { position: fixed; left: -260px; top: 0; width: 250px; height: 100%; background: #0f0f0f; z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding-top: 60px; border-right: 1px solid #222; }
+        .sidebar { position: fixed; left: -260px; top: 0; width: 250px; height: 100%; background: #0f0f0f; z-index: 2000; transition: 0.4s; padding-top: 60px; border-right: 1px solid #222; }
         .sidebar.active { transform: translateX(260px); }
         .sidebar a { display: block; padding: 15px 25px; color: white; text-decoration: none; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; }
         .sidebar a:hover { background: #1a1a1a; color: red; padding-left: 35px; }
-
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 1500; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 1500; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
-
-        /* КАРТКИ ВІДЕО ТА АНІМАЦІЯ ПОЯВИ */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding: 15px; }
-        .card { background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; opacity: 0; animation: slideUp 0.5s forwards; }
-        .card:hover { border-color: red; transform: translateY(-5px) scale(1.02); box-shadow: 0 10px 20px rgba(255,0,0,0.2); }
+        .card { background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; position: relative; animation: slideUp 0.5s forwards; }
+        .card:hover { border-color: red; transform: translateY(-5px) scale(1.02); }
         .card img { width: 100%; height: 110px; object-fit: cover; }
+        .save-btn { background: rgba(255, 0, 0, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; position: absolute; top: 5px; right: 5px; font-size: 10px; z-index: 10; font-weight: bold; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* НАЛАШТУВАННЯ ТА ПЛЕЄР */
-        .settings-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; z-index: 4000; align-items: center; justify-content: center; }
-        .settings-box { background: #1a1a1a; padding: 25px; border-radius: 15px; width: 300px; border: 1px solid red; text-align: center; animation: pop 0.3s; }
-        @keyframes pop { from { transform: scale(0.8); } to { transform: scale(1); } }
-        .btn-red { background: red; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-
         .modal-play { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; display: none; flex-direction: column; }
-        iframe { width: 100%; height: 80vh; border: none; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* ДОДАНО: Стиль для індикатора завантаження */
-        #loader { text-align: center; padding: 20px; color: red; display: none; }
+        iframe { width: 100%; height: 85vh; border: none; }
+        #loader { text-align: center; padding: 20px; color: red; display: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="sidebar" id="side">
-        <a onclick="location.reload()" id="m-home">🏠 Головна</a>
-        <a onclick="loadContent('shorts mix')" id="m-shorts">⚡ Shorts</a>
-        <a onclick="loadContent('music mix')" id="m-music">🎵 Музика</a>
-        <a onclick="loadContent('gaming mix')" id="m-games">🎮 Ігри</a>
-        <a onclick="toggleSettings()" id="m-settings">⚙️ Налаштування</a>
+        <a onclick="location.reload()">🏠 Головна</a>
+        <a onclick="loadContent('shorts mix')">⚡ Shorts</a>
+        <a onclick="loadContent('music mix')">🎵 Музика</a>
+        <a onclick="loadContent('gaming mix')">🎮 Ігри</a>
+        <a onclick="showSaved()">⭐ Збережені уроки</a>
     </div>
 
     <div class="overlay" id="over" onclick="toggleSide()"></div>
@@ -69,82 +51,31 @@
         </div>
     </div>
 
+    <div id="loader">Шукаю стабільний сервер...</div>
     <div class="grid" id="videoGrid"></div>
-    <div id="loader">Завантаження...</div>
-
-    <div class="settings-overlay" id="setWin">
-        <div class="settings-box">
-            <h2 id="st-title" style="color:red">⚙️ Налаштування</h2>
-            <p id="st-lang-label">Змінити мову:</p>
-            <select id="langSelect" style="width:100%; padding:10px; background:#333; color:white; border:none; border-radius:5px;">
-                <option value="uk">Українська</option>
-                <option value="en">English</option>
-                <option value="ru">Русский</option>
-            </select>
-            <button class="btn-red" onclick="changeLang()">ЗБЕРЕГТИ</button>
-            <hr style="margin:20px 0; border:0.5px solid #333;">
-            <p id="st-about">Про додаток (Beta)</p>
-            <a href="https://t.me/Misterio896" target="_blank" id="st-contact" style="color:#0088cc; text-decoration:none;">Пишіть: @Misterio896</a>
-            <button class="btn-red" style="background:#333" onclick="toggleSettings()">← НАЗАД</button>
-        </div>
-    </div>
 
     <div class="modal-play" id="player">
-        <button style="background:#222; color:white; border:none; padding:15px; text-align:left; cursor:pointer;" onclick="closePlayer()">← НАЗАД</button>
+        <button style="background:#222; color:white; border:none; padding:15px; cursor:pointer;" onclick="closePlayer()">← НАЗАД</button>
         <div id="videoContainer"></div>
     </div>
 
     <script>
-        const TEXTS = {
-            'uk': {home: '🏠 Головна', shorts: '⚡ Shorts', music: '🎵 Музика', games: '🎮 Ігри', settings: '⚙️ Налаштування', search: 'Пошук...', about: 'Про додаток', contact: 'Пишіть: @Misterio896', lang_label: 'Змінити мову:'},
-            'en': {home: '🏠 Home', shorts: '⚡ Shorts', music: '🎵 Music', games: '🎮 Games', settings: '⚙️ Settings', search: 'Search...', about: 'About App', contact: 'Write: @Misterio896', lang_label: 'Change language:'},
-            'ru': {home: '🏠 Главная', shorts: '⚡ Shorts', music: '🎵 Музыка', games: 'Игры', settings: '⚙️ Настройки', search: 'Поиск...', about: 'О приложении', contact: 'Пишите: @Misterio896', lang_label: 'Сменить язык:'}
-        };
-
-        let currentLang = localStorage.getItem('lang') || 'uk';
-        
-        // ДОДАНО: Змінні для нескінченного скролу
-        let currentQuery = 'trending 2026';
+        let currentQuery = 'trending';
         let currentPage = 1;
         let isLoading = false;
-
-        function updateUI() {
-            const t = TEXTS[currentLang];
-            document.getElementById('m-home').innerText = t.home;
-            document.getElementById('m-shorts').innerText = t.shorts;
-            document.getElementById('m-music').innerText = t.music;
-            document.getElementById('m-games').innerText = t.games;
-            document.getElementById('m-settings').innerText = t.settings;
-            document.getElementById('searchInput').placeholder = t.search;
-            document.getElementById('st-title').innerText = t.settings;
-            document.getElementById('st-lang-label').innerText = t.lang_label;
-            document.getElementById('st-about').innerText = t.about;
-            document.getElementById('st-contact').innerText = t.contact;
-        }
-
-        function changeLang() {
-            currentLang = document.getElementById('langSelect').value;
-            localStorage.setItem('lang', currentLang);
-            updateUI(); toggleSettings();
-        }
+        
+        // Список робочих серверів
+        const instances = [
+            'https://inv.tux.pizza',
+            'https://invidious.projectsegfau.lt',
+            'https://invidious.lunar.icu',
+            'https://yewtu.be'
+        ];
+        let currentInstance = 0;
 
         function toggleSide() {
             document.getElementById('side').classList.toggle('active');
             document.getElementById('over').classList.toggle('active');
-        }
-
-        function toggleSettings() {
-            let win = document.getElementById('setWin');
-            win.style.display = (win.style.display == 'flex') ? 'none' : 'flex';
-        }
-
-        // ДОДАНО: Функція для нового пошуку (очищає сітку)
-        function startNewSearch() {
-            const q = document.getElementById('searchInput').value;
-            currentQuery = q;
-            currentPage = 1;
-            document.getElementById('videoGrid').innerHTML = "";
-            search();
         }
 
         async function search() {
@@ -152,58 +83,101 @@
             isLoading = true;
             document.getElementById('loader').style.display = 'block';
 
+            // Проксі для обходу помилки CORS
+            const proxy = "https://api.allorigins.win/get?url=";
+            const targetUrl = `${instances[currentInstance]}/api/v1/search?q=${encodeURIComponent(currentQuery)}&page=${currentPage}&type=video`;
+
             try {
-                // Використовуємо currentPage для підвантаження нових відео
-                const res = await fetch(`https://invidious.flokinet.is/api/v1/search?q=${encodeURIComponent(currentQuery)}&type=video&page=${currentPage}`);
-                const data = await res.json();
-                
+                const response = await fetch(proxy + encodeURIComponent(targetUrl));
+                const resData = await response.json();
+                const data = JSON.parse(resData.contents);
+
+                if (!data || data.length === 0) throw new Error("Empty");
+
                 const grid = document.getElementById('videoGrid');
-                data.forEach((v, i) => {
+                data.forEach(v => {
                     const card = document.createElement('div');
                     card.className = 'card';
-                    card.style.animationDelay = `${(i % 20) * 0.05}s`;
-                    card.onclick = () => play(v.videoId);
-                    card.innerHTML = `<img src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg"><p style="padding:8px;font-size:11px;margin:0;height:35px;overflow:hidden;">${v.title}</p>`;
+                    card.innerHTML = `
+                        <button class="save-btn" onclick="event.stopPropagation(); saveLesson('${v.videoId}', '${v.title.replace(/'/g, "")}')">⭐ Зберегти</button>
+                        <div onclick="play('${v.videoId}')">
+                            <img src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg">
+                            <p style="padding:8px;font-size:11px;margin:0;height:35px;overflow:hidden;">${v.title}</p>
+                        </div>
+                    `;
                     grid.appendChild(card);
                 });
-                
-                currentPage++; // Готуємо наступну сторінку
-            } catch (e) { 
-                console.error("Помилка завантаження");
+                currentPage++;
+            } catch (e) {
+                console.log("Зміна сервера...");
+                currentInstance = (currentInstance + 1) % instances.length;
+                setTimeout(search, 1000); 
             } finally {
                 isLoading = false;
                 document.getElementById('loader').style.display = 'none';
             }
         }
 
-        // ДОДАНО: Слідкуємо за скролом для нескінченної стрічки
-        window.onscroll = function() {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) {
-                search();
+        function saveLesson(id, title) {
+            let saved = JSON.parse(localStorage.getItem('misteSaved')) || [];
+            if (!saved.some(v => v.id === id)) {
+                saved.push({ id, title });
+                localStorage.setItem('misteSaved', JSON.stringify(saved));
+                alert('Урок збережено!');
             }
-        };
+        }
 
-        function loadContent(q) { 
-            if(document.getElementById('side').classList.contains('active')) toggleSide(); 
-            currentQuery = q;
-            currentPage = 1;
-            document.getElementById('videoGrid').innerHTML = "";
-            search(); 
+        function showSaved() {
+            toggleSide();
+            const grid = document.getElementById('videoGrid');
+            grid.innerHTML = '<h2 style="grid-column: 1/-1; padding:15px; color:red;">⭐ Ваші уроки:</h2>';
+            let saved = JSON.parse(localStorage.getItem('misteSaved')) || [];
+            if (saved.length === 0) { grid.innerHTML += '<p style="padding:15px;">Список порожній.</p>'; return; }
+            saved.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => play(v.id);
+                card.innerHTML = `
+                    <img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg">
+                    <p style="padding:8px;font-size:11px;margin:0;">${v.title}</p>
+                    <button class="save-btn" onclick="event.stopPropagation(); deleteLesson('${v.id}')">❌</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function deleteLesson(id) {
+            let saved = JSON.parse(localStorage.getItem('misteSaved')) || [];
+            saved = saved.filter(v => v.id !== id);
+            localStorage.setItem('misteSaved', JSON.stringify(saved));
+            showSaved();
         }
 
         function play(id) {
             document.getElementById('player').style.display = 'flex';
-            document.getElementById('videoContainer').innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allowfullscreen allow="autoplay"></iframe>`;
+            document.getElementById('videoContainer').innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
         }
 
-        function closePlayer() { document.getElementById('player').style.display = 'none'; document.getElementById('videoContainer').innerHTML = ""; }
+        function closePlayer() {
+            document.getElementById('player').style.display = 'none';
+            document.getElementById('videoContainer').innerHTML = "";
+        }
 
-        // ДОДАНО: При старті вантажимо одразу 100 відео (2 сторінки)
-        window.onload = async () => { 
-            updateUI(); 
-            await search(); // Перші 50
-            search();       // Ще 50 (разом 100)
-        };
+        function loadContent(q) {
+            if(document.getElementById('side').classList.contains('active')) toggleSide();
+            currentQuery = q;
+            currentPage = 1;
+            document.getElementById('videoGrid').innerHTML = "";
+            search();
+        }
+
+        function startNewSearch() {
+            const q = document.getElementById('searchInput').value;
+            if(q) loadContent(q);
+        }
+
+        window.onload = () => search();
+        window.onscroll = () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) search(); };
     </script>
 </body>
 </html>
